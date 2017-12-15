@@ -1,0 +1,37 @@
+spring:
+    mvc:
+        throw-exception-if-no-handler-found: true
+    datasource:
+        url: ${JDBC_HOST:jdbc:mysql://localhost:3306/basicSpringBootRestAPI?useSSL=false&autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8}
+        username: ${JDBC_USERNAME:root}
+        password: ${JDBC_PASSWORD:root}
+        driver-class-name: com.mysql.jdbc.Driver
+        tomcat:
+            max-wait: 20000
+            max-active: 50
+            max-idle: 20
+            min-idle: 15
+    jpa:
+        database: MYSQL
+        showSql: true
+        hibernate:
+            ddl-auto: update
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.MySQLDialect
+                format_sql: true
+    data:
+        mongodb:
+            host: ${MONGO_HOST:localhost}
+            port: ${MONGO_PORT:27017}
+            username: ${MONGO_USERNAME:root}
+            password: ${MONGO_PASSWORD:root}
+            database: ${MONGO_DATABASE:basicSpringBootRestAPI}
+
+logging:
+    level:
+        com.basicSpringBootRestAPI:
+            interceptor.ApplicationInterceptor: INFO
+
+server:
+    port: 8181
