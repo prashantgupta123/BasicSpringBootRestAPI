@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.sql.DataSource;
@@ -31,6 +32,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private CustomUserDetailsService userDetailsService;
+
+    @Autowired
+    private BasicAuthenticationEntryPoint entryPoint;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -63,11 +67,14 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user").hasAuthority("ROLE_USER")
                 .antMatchers("/admin").hasAuthority("ROLE_ADMIN")
                 .antMatchers("/register/**").permitAll()
-                .antMatchers("/rest/api/**").permitAll()
+                .antMatchers("/rest/api/**").hasAuthority("ROLE_USER")
                 .antMatchers("/**").denyAll()
                 .anyRequest().authenticated()
 
                 .and()
+                .httpBasic().authenticationEntryPoint(entryPoint)
+
+                /*.and()
                 .formLogin()
                 .successHandler(loginSuccess)
                 .loginPage("/login")
@@ -86,7 +93,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .tokenValiditySeconds(3600)
                 .rememberMeCookieName("rememberMeCookie")
                 .rememberMeParameter("rememberMe")
-                .tokenRepository(persistentTokenRepository())
+                .tokenRepository(persistentTokenRepository())*/
 
                 .and()
                 .exceptionHandling().accessDeniedPage("/403");

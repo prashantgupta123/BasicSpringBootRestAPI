@@ -12,7 +12,7 @@ import java.util.Map;
 @RequestMapping(value = "rest")
 public class RestAPIController {
 
-    @RequestMapping(value = "/api1", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/api", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public Map home() {
         Map<String, String> map = new HashMap<>();
         map.put("1", "ONE");
