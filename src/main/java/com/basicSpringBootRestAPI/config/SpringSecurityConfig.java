@@ -1,7 +1,6 @@
 package com.basicSpringBootRestAPI.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -9,25 +8,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
-import javax.sql.DataSource;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
-
-    @Autowired
-    private LoginSuccess loginSuccess;
-
-    @Autowired
-    private LogoutSuccess logoutSuccess;
-
-    @Autowired
-    private DataSource dataSource;
 
     @Autowired
     private CustomUserDetailsService userDetailsService;
@@ -45,50 +31,16 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .withUser("admin").password("pass").roles("ADMIN");
     }*/
 
-    /*create table persistent_logins (username varchar(64) not null, series varchar(64) primary key, token varchar(64) not null, last_used timestamp not null)*/
-
-    @Bean
-    public PersistentTokenRepository persistentTokenRepository() {
-        JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
-        jdbcTokenRepository.setDataSource(dataSource);
-        return jdbcTokenRepository;
-    }
-
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf()
-                .disable()
-                .authorizeRequests()
-                .antMatchers("/user").hasAuthority("ROLE_USER")
-                .antMatchers("/admin").hasAuthority("ROLE_ADMIN")
-                .antMatchers("/register/**").permitAll()
-                .antMatchers("/rest/api/**").permitAll()
-                .antMatchers("/**").denyAll()
-                .anyRequest().authenticated()
+    protected void configure(final HttpSecurity http) throws Exception {
 
-                .and()
-                .formLogin()
-                .successHandler(loginSuccess)
-                .loginPage("/login")
-                .loginProcessingUrl("/loginAction")
-                .permitAll()
+        //Implementing Token based authentication in this filter
+        final TokenAuthenticationFilter tokenFilter = new TokenAuthenticationFilter();
+        http.addFilterBefore(tokenFilter, BasicAuthenticationFilter.class);
 
-                .and()
-                .logout()
-                .logoutSuccessHandler(logoutSuccess)
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
-                .logoutSuccessUrl("/login")
-                .permitAll()
+        //Creating token when basic authentication is successful and the same token can be used to authenticate for further requests
+        final CustomBasicAuthenticationFilter customBasicAuthFilter = new CustomBasicAuthenticationFilter(this.authenticationManager());
+        http.addFilter(customBasicAuthFilter);
 
-                .and()
-                .rememberMe()
-                .tokenValiditySeconds(3600)
-                .rememberMeCookieName("rememberMeCookie")
-                .rememberMeParameter("rememberMe")
-                .tokenRepository(persistentTokenRepository())
-
-                .and()
-                .exceptionHandling().accessDeniedPage("/403");
     }
 }
