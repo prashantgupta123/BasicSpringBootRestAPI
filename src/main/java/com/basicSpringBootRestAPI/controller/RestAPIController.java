@@ -1,7 +1,10 @@
 package com.basicSpringBootRestAPI.controller;
 
+import com.basicSpringBootRestAPI.dto.response.AbstractResponseDto;
+import com.basicSpringBootRestAPI.util.ResponseUtil;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,26 +16,18 @@ import java.util.Map;
 @RequestMapping(value = "rest")
 public class RestAPIController {
 
-    @Secured("ROLE_USER")
     @RequestMapping(value = "/api", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map home() {
+    public HttpEntity<AbstractResponseDto> home() {
         Map<String, String> map = new HashMap<>();
         map.put("1", "ONE");
         map.put("2", "TWO");
         map.put("3", "THREE");
-        map.put("4", "ROLE_USER");
-        return map;
+        return ResponseUtil.success().body(map).send(HttpStatus.OK, "Response map fetch successfully");
     }
 
-    @Secured("ROLE_ADMIN")
-    @RequestMapping(value = "/api1", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map home1() {
-        Map<String, String> map = new HashMap<>();
-        map.put("1", "ONE");
-        map.put("2", "TWO");
-        map.put("3", "THREE");
-        map.put("4", "ROLE_ADMIN");
-        return map;
+    @RequestMapping(value = "/apiError", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public HttpEntity<AbstractResponseDto> homeError() {
+        return ResponseUtil.error().send(HttpStatus.INTERNAL_SERVER_ERROR, "Response not found");
     }
 
 }
