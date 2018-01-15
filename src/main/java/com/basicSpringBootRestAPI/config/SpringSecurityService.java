@@ -31,9 +31,10 @@ public class SpringSecurityService {
 
     public String saveUserAuthenticationToken(User user) {
         String token = UUID.randomUUID().toString().toUpperCase() + "|" + user.getId();
-        UserAuthenticationToken verificationToken = null;
-
-        verificationToken = new UserAuthenticationToken();
+        UserAuthenticationToken verificationToken = userAuthenticationTokenRepository.findByUser(user);
+        if (verificationToken == null) {
+            verificationToken = new UserAuthenticationToken();
+        }
         verificationToken.setToken(token);
         verificationToken.setUser(user);
         userAuthenticationTokenRepository.save(verificationToken);

@@ -45,7 +45,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/rest/token").permitAll()
                 .antMatchers(HttpMethod.POST, "/rest/api/login").permitAll()
-                .antMatchers("/rest/**").hasAuthority(UserRoleEnum.ROLE_USER.getValue())
+                .antMatchers("/rest/**").authenticated()
                 .antMatchers("/**").denyAll()
                 .anyRequest().authenticated().and()
                 .addFilterBefore(new StatelessLoginFilter("/rest/api/login", tokenAuthenticationService, springSecurityService, authenticationManager()), UsernamePasswordAuthenticationFilter.class)

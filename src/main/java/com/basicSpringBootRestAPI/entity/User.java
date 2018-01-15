@@ -18,7 +18,7 @@ public class User implements Serializable {
     private String password;
     private boolean enabled;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
@@ -30,7 +30,6 @@ public class User implements Serializable {
         this.username = username;
     }
 
-    @JsonIgnore
     public String getPassword() {
         return password;
     }
