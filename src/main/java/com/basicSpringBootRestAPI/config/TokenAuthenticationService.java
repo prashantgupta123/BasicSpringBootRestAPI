@@ -1,5 +1,6 @@
 package com.basicSpringBootRestAPI.config;
 
+import com.basicSpringBootRestAPI.constant.ApplicationConstant;
 import com.basicSpringBootRestAPI.entity.Role;
 import com.basicSpringBootRestAPI.entity.UserAuthenticationToken;
 import com.basicSpringBootRestAPI.repository.UserAuthenticationTokenRepository;
@@ -18,16 +19,18 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class TokenAuthenticationService {
 
     @Autowired
     private UserAuthenticationTokenRepository userAuthenticationTokenRepository;
+    @Autowired
+    SpringSecurityService springSecurityService;
 
     public Authentication getAuthentication(HttpServletRequest request) {
         System.out.println("TokenAuthenticationService -> getAuthentication");
-        
-        final String accessToken = request.getHeader("oauth-token");
+
+        final String accessToken = request.getHeader(ApplicationConstant.TOKEN_HEADER);
         if (accessToken != null) {
             UserAuthenticationToken userAuthenticationToken = null;
             try {
@@ -64,7 +67,9 @@ public class TokenAuthenticationService {
     }
 
     public void addAuthentication(HttpServletResponse response, UserAuthentication authentication) {
+        System.out.println("TokenAuthenticationService -> addAuthentication");
         final com.basicSpringBootRestAPI.entity.User user = authentication.getDetails();
-        response.addHeader("oauth-token", "123456789");
+        String token = springSecurityService.saveUserAuthenticationToken(user);
+        response.addHeader(ApplicationConstant.TOKEN_HEADER, token);
     }
 }

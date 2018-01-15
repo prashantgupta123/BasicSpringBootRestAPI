@@ -1,5 +1,7 @@
 package com.basicSpringBootRestAPI.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
@@ -28,6 +30,7 @@ public class User implements Serializable {
         this.username = username;
     }
 
+    @JsonIgnore
     public String getPassword() {
         return password;
     }
@@ -52,6 +55,7 @@ public class User implements Serializable {
         this.enabled = enabled;
     }
 
+    @JsonIgnore
     public Set<Role> getRoles() {
         return roles;
     }

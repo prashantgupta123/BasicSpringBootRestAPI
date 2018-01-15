@@ -1,7 +1,11 @@
 package com.basicSpringBootRestAPI.config;
 
+import com.basicSpringBootRestAPI.enums.UserRoleEnum;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,6 +23,12 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private CustomUserDetailsService userDetailsService;
     @Autowired
     private TokenAuthenticationService tokenAuthenticationService;
+    @Autowired
+    private SpringSecurityService springSecurityService;
+
+    public SpringSecurityConfig() {
+        super(true);
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -29,10 +39,22 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
         http
                 .exceptionHandling().accessDeniedPage("/403").and()
+                .anonymous().and()
+                .servletApi().and()
+                .headers().cacheControl().and().and()
                 .authorizeRequests()
-                .antMatchers("/rest/**").authenticated()
+                .antMatchers("/rest/token").permitAll()
+                .antMatchers(HttpMethod.POST, "/rest/api/login").permitAll()
+                .antMatchers("/rest/**").hasAuthority(UserRoleEnum.ROLE_USER.getValue())
                 .antMatchers("/**").denyAll()
                 .anyRequest().authenticated().and()
+                .addFilterBefore(new StatelessLoginFilter("/rest/api/login", tokenAuthenticationService, springSecurityService, authenticationManager()), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new TokenAuthenticationFilter(tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class);
+    }
+
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 }

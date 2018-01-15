@@ -7,10 +7,12 @@ import com.basicSpringBootRestAPI.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @Service
+@Transactional
 public class SpringSecurityService {
 
     @Autowired
@@ -29,7 +31,9 @@ public class SpringSecurityService {
 
     public String saveUserAuthenticationToken(User user) {
         String token = UUID.randomUUID().toString().toUpperCase() + "|" + user.getId();
-        UserAuthenticationToken verificationToken = new UserAuthenticationToken();
+        UserAuthenticationToken verificationToken = null;
+
+        verificationToken = new UserAuthenticationToken();
         verificationToken.setToken(token);
         verificationToken.setUser(user);
         userAuthenticationTokenRepository.save(verificationToken);
