@@ -1,5 +1,6 @@
 package com.basicSpringBootRestAPI.config;
 
+import com.basicSpringBootRestAPI.constant.ApplicationConstant;
 import com.basicSpringBootRestAPI.entity.Role;
 import com.basicSpringBootRestAPI.entity.UserAuthenticationToken;
 import com.basicSpringBootRestAPI.repository.UserAuthenticationTokenRepository;
@@ -26,7 +27,7 @@ public class TokenAuthenticationService {
     public Authentication getAuthentication(HttpServletRequest request) {
         System.out.println("TokenAuthenticationService -> getAuthentication");
         
-        final String accessToken = request.getHeader("oauth-token");
+        final String accessToken = request.getHeader(ApplicationConstant.TOKEN_HEADER);
         if (accessToken != null) {
             UserAuthenticationToken userAuthenticationToken = null;
             try {

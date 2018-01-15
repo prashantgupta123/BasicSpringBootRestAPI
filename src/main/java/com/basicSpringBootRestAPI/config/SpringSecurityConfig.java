@@ -21,7 +21,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .exceptionHandling().accessDeniedPage("/403").and()
                 .authorizeRequests()
-                .antMatchers("/rest/**").authenticated()
+                .antMatchers("/rest/token").permitAll()
+                .antMatchers("/rest/**").fullyAuthenticated()
                 .antMatchers("/**").denyAll()
                 .anyRequest().authenticated().and()
                 .addFilterBefore(new TokenAuthenticationFilter(tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class);
