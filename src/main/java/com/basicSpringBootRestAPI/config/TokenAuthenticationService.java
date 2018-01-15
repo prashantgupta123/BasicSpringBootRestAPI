@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -60,5 +61,10 @@ public class TokenAuthenticationService {
             return new UsernamePasswordAuthenticationToken(user, null, userSpring.getAuthorities());
         }
         return null;
+    }
+
+    public void addAuthentication(HttpServletResponse response, UserAuthentication authentication) {
+        final com.basicSpringBootRestAPI.entity.User user = authentication.getDetails();
+        response.addHeader("oauth-token", "123456789");
     }
 }
