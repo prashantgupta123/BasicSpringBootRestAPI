@@ -20,14 +20,22 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
         http
-                .exceptionHandling().accessDeniedPage("/403").and()
+                .csrf()
+                .disable()
+                .exceptionHandling().accessDeniedPage("/403")
+
+                .and()
                 .authorizeRequests()
                 .antMatchers("/rest/token").permitAll()
                 .antMatchers("/rest/**").fullyAuthenticated()
                 .antMatchers("/**").denyAll()
                 .anyRequest().authenticated()
 
-                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().addFilterBefore(new TokenAuthenticationFilter(tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class);
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
+                .and()
+                .addFilterBefore(new TokenAuthenticationFilter(tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class);
     }
 }
