@@ -1,6 +1,5 @@
 package com.basicSpringBootRestAPI.config;
 
-import com.basicSpringBootRestAPI.enums.UserRoleEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +10,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -38,16 +38,32 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
         http
-                .exceptionHandling().accessDeniedPage("/403").and()
-                .anonymous().and()
-                .servletApi().and()
-                .headers().cacheControl().and().and()
+                .csrf()
+                .disable()
+
+                .anonymous()
+                .disable()
+
+                .exceptionHandling().accessDeniedPage("/403")
+
+                .and()
+                .servletApi()
+
+                .and()
+//                .headers().cacheControl().and().and()
+
                 .authorizeRequests()
                 .antMatchers("/rest/token").permitAll()
                 .antMatchers(HttpMethod.POST, "/rest/api/login").permitAll()
                 .antMatchers("/rest/**").authenticated()
                 .antMatchers("/**").denyAll()
-                .anyRequest().authenticated().and()
+                .anyRequest().authenticated()
+
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
+                .and()
                 .addFilterBefore(new StatelessLoginFilter("/rest/api/login", tokenAuthenticationService, springSecurityService, authenticationManager()), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new TokenAuthenticationFilter(tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class);
     }
