@@ -20,9 +20,9 @@ public class CustomBasicAuthenticationEntryPoint extends BasicAuthenticationEntr
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        System.out.println("CustomBasicAuthenticationEntryPoint -> afterPropertiesSet");
         String REALM = "Restful Spring Security Application";
         setRealmName(REALM);
         super.afterPropertiesSet();
+        System.out.println("CustomBasicAuthenticationEntryPoint -> afterPropertiesSet");
     }
 }
